@@ -1,0 +1,15 @@
+@if (session.isSigned()) {
+  <mat-toolbar color="primary">
+    <mat-icon>favorite</mat-icon>
+    <span class="app-title">Il nostro matrimonio</span>
+    <span class="spacer"></span>
+    <button class="nav-link" routerLink="/galleria">
+      <mat-icon>photo_library</mat-icon> Galleria
+    </button>
+    <button class="nav-link" routerLink="/carica">
+      <mat-icon>add_a_photo</mat-icon> Carica
+    </button>
+  </mat-toolbar>
+}
+
+<router-outlet></router-outlet>

@@ -1,0 +1,25 @@
+.app-title {
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 4px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}

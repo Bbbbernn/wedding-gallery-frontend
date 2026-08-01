@@ -1,0 +1,73 @@
+<div class="gallery-page">
+
+  <div class="toolbar">
+    <mat-button-toggle-group [value]="filterType()" (change)="onFilterChange($event.value)">
+      <mat-button-toggle [value]="null">Tutti</mat-button-toggle>
+      <mat-button-toggle value="PHOTO">
+        <mat-icon>photo</mat-icon> Foto
+      </mat-button-toggle>
+      <mat-button-toggle value="VIDEO">
+        <mat-icon>videocam</mat-icon> Video
+      </mat-button-toggle>
+      <mat-button-toggle value="AUDIO">
+        <mat-icon>mic</mat-icon> Audio
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  @if (loading()) {
+    <div class="state-message">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="state-message">
+      <mat-icon class="empty-icon">photo_library</mat-icon>
+      <p>Non ci sono ancora contributi{{ filterType() ? ' di questo tipo' : '' }}.</p>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (item of items(); track item.id) {
+        <div class="grid-item">
+
+          @switch (item.mediaType) {
+            @case ('PHOTO') {
+              <img [src]="thumbnailFor(item)" [alt]="item.originalFilename" loading="lazy">
+            }
+            @case ('VIDEO') {
+              <video [src]="contentFor(item)" controls preload="metadata"></video>
+            }
+            @case ('AUDIO') {
+              <div class="audio-tile">
+                <mat-icon>mic</mat-icon>
+                <audio [src]="contentFor(item)" controls preload="metadata"></audio>
+              </div>
+            }
+          }
+
+          <div class="item-footer">
+            <span class="guest-name">{{ item.guestName }}</span>
+            <a mat-icon-button [href]="downloadFor(item)" download
+               [attr.aria-label]="'Scarica ' + item.originalFilename" title="Scarica">
+              <mat-icon>download</mat-icon>
+            </a>
+          </div>
+          @if (item.caption) {
+            <p class="caption">{{ item.caption }}</p>
+          }
+        </div>
+      }
+    </div>
+
+    @if (hasMore()) {
+      <div class="load-more">
+        <button mat-stroked-button (click)="loadMore()" [disabled]="loadingMore()">
+          @if (loadingMore()) {
+            <mat-spinner diameter="18"></mat-spinner>
+          } @else {
+            Carica altri
+          }
+        </button>
+      </div>
+    }
+  }
+</div>

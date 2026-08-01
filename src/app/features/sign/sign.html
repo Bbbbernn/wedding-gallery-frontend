@@ -1,0 +1,33 @@
+<div class="sign-page">
+  <mat-card class="sign-card">
+    <mat-card-header>
+      <mat-card-title>Benvenuto!</mat-card-title>
+      <mat-card-subtitle>Firmati per condividere le tue foto, video e audio del matrimonio</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form (ngSubmit)="submit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Il tuo nome</mat-label>
+          <input matInput [(ngModel)]="displayName" name="displayName" maxlength="80" required
+                 placeholder="Es. Mario e Anna Rossi">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Un pensiero per gli sposi (facoltativo)</mat-label>
+          <textarea matInput [(ngModel)]="message" name="message" maxlength="500" rows="3"
+                    placeholder="Auguri..."></textarea>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" type="submit" class="full-width"
+                [disabled]="!canSubmit">
+          @if (submitting()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Firma e continua
+          }
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
