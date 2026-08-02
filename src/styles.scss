@@ -4,9 +4,9 @@
    ============================================================ */
 
 :root {
-  --verde: #94a794;
-  --verde-scuro: #607560;
-  --verde-2: #7e957e;
+  --verde: #39463d;
+  --verde-scuro: #26302a;
+  --verde-2: #4a5a4f;
   --salvia: #7c9a86;
   --salvia-chiaro: #e7efe9;
   --lilla: #a88cc8;
@@ -122,7 +122,7 @@ button { cursor: pointer; }
 .btn:disabled { opacity: 0.45; cursor: default; }
 .btn--block { width: 100%; }
 .btn--verde { background: var(--verde-scuro); color: var(--avorio); }
-.btn--lilla { background: var(--lilla); color: var(--verde); box-shadow: 0 10px 30px rgba(168, 140, 200, 0.28); }
+.btn--lilla { background: var(--lilla); color: var(--verde-scuro); box-shadow: 0 10px 30px rgba(168, 140, 200, 0.28); }
 .btn--viola { background: var(--viola); color: var(--avorio); }
 .btn--ghost {
   background: transparent;
