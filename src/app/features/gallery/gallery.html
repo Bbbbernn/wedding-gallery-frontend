@@ -1,73 +1,94 @@
-<div class="gallery-page">
+<section class="page page--nav gallery">
 
-  <div class="toolbar">
-    <mat-button-toggle-group [value]="filterType()" (change)="onFilterChange($event.value)">
-      <mat-button-toggle [value]="null">Tutti</mat-button-toggle>
-      <mat-button-toggle value="PHOTO">
-        <mat-icon>photo</mat-icon> Foto
-      </mat-button-toggle>
-      <mat-button-toggle value="VIDEO">
-        <mat-icon>videocam</mat-icon> Video
-      </mat-button-toggle>
-      <mat-button-toggle value="AUDIO">
-        <mat-icon>mic</mat-icon> Audio
-      </mat-button-toggle>
-    </mat-button-toggle-group>
-  </div>
-
-  @if (loading()) {
-    <div class="state-message">
-      <mat-spinner diameter="40"></mat-spinner>
+  <header class="gallery__bar">
+    <div class="gallery__brand">
+      <img src="logo-mr.png" alt="" />
+      <div>
+        <span class="eyebrow">La galleria di</span>
+        <span class="gallery__couple">Michela e Roberto</span>
+      </div>
     </div>
-  } @else if (items().length === 0) {
-    <div class="state-message">
-      <mat-icon class="empty-icon">photo_library</mat-icon>
-      <p>Non ci sono ancora contributi{{ filterType() ? ' di questo tipo' : '' }}.</p>
-    </div>
-  } @else {
-    <div class="grid">
-      @for (item of items(); track item.id) {
-        <div class="grid-item">
 
-          @switch (item.mediaType) {
-            @case ('PHOTO') {
-              <img [src]="thumbnailFor(item)" [alt]="item.originalFilename" loading="lazy">
-            }
-            @case ('VIDEO') {
-              <video [src]="contentFor(item)" controls preload="metadata"></video>
-            }
-            @case ('AUDIO') {
-              <div class="audio-tile">
-                <mat-icon>mic</mat-icon>
-                <audio [src]="contentFor(item)" controls preload="metadata"></audio>
-              </div>
-            }
-          }
-
-          <div class="item-footer">
-            <span class="guest-name">{{ item.guestName }}</span>
-            <a mat-icon-button [href]="downloadFor(item)" download
-               [attr.aria-label]="'Scarica ' + item.originalFilename" title="Scarica">
-              <mat-icon>download</mat-icon>
-            </a>
-          </div>
-          @if (item.caption) {
-            <p class="caption">{{ item.caption }}</p>
-          }
-        </div>
+    <div class="gallery__chips">
+      @for (filter of filters; track filter.label) {
+        <button
+          type="button"
+          class="chip"
+          [class.chip--on]="filterType() === filter.key"
+          (click)="onFilterChange(filter.key)"
+        >
+          {{ filter.label }}
+        </button>
       }
     </div>
+  </header>
 
-    @if (hasMore()) {
-      <div class="load-more">
-        <button mat-stroked-button (click)="loadMore()" [disabled]="loadingMore()">
-          @if (loadingMore()) {
-            <mat-spinner diameter="18"></mat-spinner>
-          } @else {
-            Carica altri
-          }
-        </button>
+  <div class="gallery__body">
+    @if (loading()) {
+      <div class="state">
+        <div class="state__spinner" aria-label="Caricamento"></div>
       </div>
+    } @else if (items().length === 0) {
+      <div class="state">
+        <img class="state__mark" src="logo-mr.png" alt="" />
+        <p class="state__title">Ancora nessun ricordo</p>
+        <p class="state__text">Sii tu il primo a lasciare qualcosa qui dentro.</p>
+      </div>
+    } @else {
+      <div class="masonry">
+        @for (item of items(); track item.id; let i = $index) {
+          <article class="tile" (click)="openViewer(i)">
+            <div class="tile__media">
+              @if (item.mediaType === 'PHOTO') {
+                <img [src]="thumbnailFor(item)" [alt]="item.originalFilename" loading="lazy" decoding="async" />
+              } @else {
+                <video [src]="contentFor(item)" preload="metadata" controls playsinline></video>
+                <span class="tile__badge">▶</span>
+              }
+            </div>
+            <div class="tile__foot">
+              <span class="tile__guest">{{ item.guestName }}</span>
+              @if (item.caption) {
+                <span class="tile__caption">{{ item.caption }}</span>
+              }
+            </div>
+          </article>
+        }
+      </div>
+
+      @if (hasMore()) {
+        <div class="gallery__more">
+          <button class="btn btn--ghost" type="button" (click)="loadMore()" [disabled]="loadingMore()">
+            {{ loadingMore() ? 'Un attimo…' : 'Carica altri ricordi' }}
+          </button>
+        </div>
+      }
+      <p class="gallery__count">{{ items().length }} ricordi condivisi finora</p>
     }
+  </div>
+
+  @if (viewerItem; as item) {
+    <div class="viewer" role="dialog" aria-modal="true">
+      <div class="viewer__bar">
+        <button class="viewer__btn" type="button" (click)="closeViewer()" aria-label="Chiudi">✕</button>
+        <span class="viewer__pos">{{ (viewerIndex() ?? 0) + 1 }} / {{ items().length }}</span>
+        <a class="viewer__btn" [href]="downloadFor(item)" download aria-label="Scarica">↓</a>
+      </div>
+
+      <div class="viewer__stage">
+        <img [src]="contentFor(item)" [alt]="item.originalFilename" />
+      </div>
+
+      <div class="viewer__foot">
+        <span class="viewer__guest">{{ item.guestName }}</span>
+        @if (item.caption) {
+          <span class="viewer__caption">{{ item.caption }}</span>
+        }
+        <div class="viewer__steps">
+          <button type="button" (click)="step(-1)" [disabled]="(viewerIndex() ?? 0) === 0">← Precedente</button>
+          <button type="button" (click)="step(1)" [disabled]="(viewerIndex() ?? 0) >= items().length - 1">Successiva →</button>
+        </div>
+      </div>
+    </div>
   }
-</div>
+</section>

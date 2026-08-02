@@ -1,0 +1,64 @@
+<section class="page page--nav voices">
+
+  <header class="voices__hero">
+    <span class="eyebrow">Ascolta</span>
+    <h2 class="title">Messaggi vocali</h2>
+    <p class="lead">Le voci degli invitati, registrate durante la giornata.</p>
+  </header>
+
+  <div class="voices__list">
+    @if (loading()) {
+      <p class="voices__empty">Sto raccogliendo le voci…</p>
+    } @else if (items().length === 0) {
+      <p class="voices__empty">Nessun messaggio vocale, per ora.</p>
+    } @else {
+      @for (item of items(); track item.id) {
+        <article class="voice">
+          <audio
+            #player
+            [src]="contentFor(item)"
+            preload="metadata"
+            (timeupdate)="onTime(player, item)"
+            (ended)="onEnded(item)"
+          ></audio>
+
+          <button
+            type="button"
+            class="voice__play"
+            [class.voice__play--on]="playingId() === item.id"
+            (click)="toggle(player, item)"
+            [attr.aria-label]="playingId() === item.id ? 'Metti in pausa' : 'Ascolta'"
+          >
+            {{ playingId() === item.id ? '❚❚' : '▶' }}
+          </button>
+
+          <div class="voice__body">
+            <div class="voice__head">
+              <span class="voice__guest">{{ item.guestName }}</span>
+              <span class="voice__meta">{{ durationLabel(item) }}</span>
+            </div>
+
+            <div class="voice__wave" aria-hidden="true">
+              @for (height of bars(item); track $index) {
+                <span
+                  class="voice__bar"
+                  [class.voice__bar--on]="barActive(item, $index)"
+                  [style.height.%]="height"
+                ></span>
+              }
+            </div>
+
+            @if (item.caption) {
+              <p class="voice__caption">{{ item.caption }}</p>
+            }
+          </div>
+        </article>
+      }
+    }
+  </div>
+
+  <div class="voices__cta">
+    <p>Anche tu hai qualcosa da dire?</p>
+    <button class="btn btn--viola" type="button" routerLink="/carica">Registra un messaggio</button>
+  </div>
+</section>

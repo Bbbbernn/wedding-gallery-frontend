@@ -1,18 +1,264 @@
-@use '@angular/material' as mat;
+/* ============================================================
+   Wedding Gallery — stile globale
+   Nessun Angular Material: tutto costruito a mano, mobile-first.
+   ============================================================ */
 
-html {
-  color-scheme: light;
+:root {
+  --verde: #1f3a31;
+  --verde-scuro: #152720;
+  --verde-2: #2c5245;
+  --salvia: #7c9a86;
+  --salvia-chiaro: #e7efe9;
+  --lilla: #a88cc8;
+  --viola: #5b4a78;
+  --lilla-soft: #ede6f4;
+  --lilla-bordo: #e4dbef;
+  --avorio: #f7f3ec;
+  --carta: #fffdf9;
+  --sabbia: #efeae2;
+  --bordo: #e7dfd2;
+  --bordo-forte: #ded6c9;
+  --testo: #23282b;
+  --muted: #8c857a;
+  --muted-2: #9a9287;
 
-  @include mat.theme((
-    color: mat.$azure-palette,
-    typography: Roboto,
-    density: 0
-  ));
+  --r-lg: 22px;
+  --r-md: 18px;
+  --r-sm: 16px;
+
+  --serif: 'Marcellus', 'Times New Roman', serif;
+  --sans: 'Karla', system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --pad-x: clamp(16px, 4.5vw, 22px);
+  --nav-h: 104px;
 }
 
+* { box-sizing: border-box; }
+
 html, body {
-  height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  background: #fafafa;
+  padding: 0;
+  min-height: 100%;
+  background: var(--sabbia);
+  color: var(--testo);
+  font-family: var(--sans);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img { max-width: 100%; display: block; }
+
+a { color: var(--viola); text-decoration: none; }
+a:hover { color: var(--lilla); }
+
+input, textarea, button, select { font: inherit; color: inherit; }
+input:focus, textarea:focus { outline: none; }
+button { cursor: pointer; }
+
+/* ---------- guscio dell'app: colonna centrata su qualsiasi schermo ---------- */
+
+.shell {
+  width: 100%;
+  max-width: 460px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--avorio);
+  position: relative;
+  overflow-x: hidden;
+  box-shadow: 0 0 60px rgba(31, 58, 49, 0.14);
+}
+
+.page { min-height: 100vh; min-height: 100dvh; }
+.page--nav { padding-bottom: var(--nav-h); }
+
+/* ---------- tipografia ---------- */
+
+.eyebrow {
+  font-size: clamp(9.5px, 2.6vw, 11px);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--salvia);
+  padding-left: 0.34em;
+}
+
+.title {
+  margin: 8px 0 8px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(26px, 7.5vw, 32px);
+  line-height: 1.15;
+  color: var(--verde);
+}
+
+.lead {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+
+/* ---------- bottoni ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 26px;
+  border: none;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.btn:active { transform: scale(0.985); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn--block { width: 100%; }
+.btn--verde { background: var(--verde); color: var(--avorio); }
+.btn--lilla { background: var(--lilla); color: var(--verde); box-shadow: 0 10px 30px rgba(168, 140, 200, 0.28); }
+.btn--viola { background: var(--viola); color: var(--avorio); }
+.btn--ghost {
+  background: transparent;
+  border: 1.5px solid var(--bordo-forte);
+  color: var(--verde);
+  min-height: 48px;
+  font-size: 14.5px;
+}
+.btn--back {
+  background: transparent;
+  border: none;
+  color: rgba(247, 243, 236, 0.6);
+  font-size: 13px;
+  padding: 0;
+  min-height: 32px;
+}
+
+.icon-btn {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--bordo);
+  background: var(--carta);
+  color: var(--salvia);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+/* ---------- campi ---------- */
+
+.field { display: flex; flex-direction: column; gap: 9px; }
+.field__label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--salvia);
+  font-weight: 600;
+}
+.field__hint { font-size: 12px; color: var(--muted-2); }
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1.5px solid var(--bordo-forte);
+  border-radius: var(--r-sm);
+  background: var(--carta);
+  font-size: 16px; /* evita lo zoom automatico su iOS */
+  color: var(--testo);
+}
+.field input { min-height: 56px; padding: 0 18px; }
+.field textarea {
+  padding: 16px 18px;
+  line-height: 1.6;
+  resize: none;
+  font-family: var(--sans);
+}
+.field input:focus,
+.field textarea:focus { border-color: var(--salvia); }
+
+/* ---------- intestazione scura ---------- */
+
+.hero-dark {
+  background: var(--verde);
+  color: var(--avorio);
+  padding: 24px var(--pad-x) 30px;
+  border-radius: 0 0 28px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-dark .title { color: var(--avorio); }
+.hero-dark .lead { color: rgba(247, 243, 236, 0.68); }
+.hero-dark .eyebrow { color: var(--lilla); }
+.hero-dark__mark {
+  position: absolute;
+  right: -26px;
+  top: -18px;
+  width: 150px;
+  filter: invert(1);
+  opacity: 0.09;
+  pointer-events: none;
+}
+.hero-dark > *:not(.hero-dark__mark) { position: relative; }
+
+/* ---------- divisore con monogramma ---------- */
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--bordo);
+}
+.divider img { width: 26px; height: 26px; object-fit: contain; opacity: 0.5; }
+
+/* ---------- toast ---------- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-h) + 8px);
+  transform: translateX(-50%);
+  z-index: 80;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  background: var(--verde);
+  color: var(--avorio);
+  border-radius: 16px;
+  padding: 14px 18px;
+  font-size: 14px;
+  line-height: 1.45;
+  box-shadow: 0 12px 32px rgba(31, 58, 49, 0.3);
+  animation: toast-in 0.2s ease both;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

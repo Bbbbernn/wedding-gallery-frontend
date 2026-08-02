@@ -6,7 +6,6 @@ import { Injectable, signal } from '@angular/core';
  */
 @Injectable()
 export class AudioRecorderService {
-
   private mediaRecorder: MediaRecorder | null = null;
   private chunks: Blob[] = [];
   private stream: MediaStream | null = null;
@@ -19,7 +18,7 @@ export class AudioRecorderService {
     this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     this.chunks = [];
     this.mediaRecorder = new MediaRecorder(this.stream);
-    this.mediaRecorder.ondataavailable = event => {
+    this.mediaRecorder.ondataavailable = (event) => {
       if (event.data.size > 0) {
         this.chunks.push(event.data);
       }
@@ -27,7 +26,7 @@ export class AudioRecorderService {
     this.mediaRecorder.start();
     this.recording.set(true);
     this.elapsedSeconds.set(0);
-    this.timer = setInterval(() => this.elapsedSeconds.update(s => s + 1), 1000);
+    this.timer = setInterval(() => this.elapsedSeconds.update((s) => s + 1), 1000);
   }
 
   stop(): Promise<File> {
@@ -52,7 +51,7 @@ export class AudioRecorderService {
   }
 
   private cleanup(): void {
-    this.stream?.getTracks().forEach(track => track.stop());
+    this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = null;
     this.mediaRecorder = null;
     this.recording.set(false);

@@ -1,15 +1,23 @@
-@if (session.isSigned()) {
-  <mat-toolbar color="primary">
-    <mat-icon>favorite</mat-icon>
-    <span class="app-title">Il nostro matrimonio</span>
-    <span class="spacer"></span>
-    <button class="nav-link" routerLink="/galleria">
-      <mat-icon>photo_library</mat-icon> Galleria
-    </button>
-    <button class="nav-link" routerLink="/carica">
-      <mat-icon>add_a_photo</mat-icon> Carica
-    </button>
-  </mat-toolbar>
-}
+<div class="shell">
+  <router-outlet></router-outlet>
 
-<router-outlet></router-outlet>
+  @if (showNav) {
+    <nav class="nav">
+      <div class="nav__inner">
+        <button class="nav__tab" [class.nav__tab--on]="isActive('/galleria')" routerLink="/galleria">
+          Galleria
+        </button>
+        <button class="nav__fab" routerLink="/carica" aria-label="Carica un ricordo">
+          <span aria-hidden="true">＋</span>
+        </button>
+        <button class="nav__tab" [class.nav__tab--on]="isActive('/voci')" routerLink="/voci">
+          Voci
+        </button>
+      </div>
+    </nav>
+  }
+
+  @if (toast.message(); as message) {
+    <div class="toast" role="status">{{ message }}</div>
+  }
+</div>

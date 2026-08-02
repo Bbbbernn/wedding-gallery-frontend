@@ -1,15 +1,8 @@
 import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { GalleryApiService } from '../../core/gallery-api.service';
+import { ToastService } from '../../core/toast.service';
 import { AudioRecorderService } from './audio-recorder.service';
 
 interface SelectedFile {
@@ -18,31 +11,19 @@ interface SelectedFile {
 }
 
 /**
- * Upload di foto, video e audio. Gestione unica per tutti i tipi (il backend
- * distingue solo tramite content-type), piu' la possibilita' di registrare
- * un messaggio audio direttamente dal microfono del browser.
+ * Upload di foto, video e audio (il backend distingue dal content-type),
+ * piu' la registrazione di un messaggio vocale dal microfono del browser.
  */
 @Component({
   selector: 'app-upload',
-  standalone: true,
-  imports: [
-    FormsModule,
-    MatButtonModule,
-    MatCardModule,
-    MatChipsModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatProgressBarModule
-  ],
+  imports: [FormsModule],
   providers: [AudioRecorderService],
   templateUrl: './upload.html',
-  styleUrl: './upload.scss'
+  styleUrl: './upload.scss',
 })
 export class Upload {
-
   private readonly api = inject(GalleryApiService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
   readonly recorder = inject(AudioRecorderService);
 
@@ -74,11 +55,15 @@ export class Upload {
     this.selectedFiles.set(current.filter((_, i) => i !== index));
   }
 
+  isAudio(item: SelectedFile): boolean {
+    return item.file.type.startsWith('audio/');
+  }
+
   async startRecording(): Promise<void> {
     try {
       await this.recorder.start();
     } catch {
-      this.snackBar.open('Impossibile accedere al microfono.', 'Chiudi', { duration: 4000 });
+      this.toast.show('Impossibile accedere al microfono.');
     }
   }
 
@@ -91,47 +76,56 @@ export class Upload {
     this.recorder.cancel();
   }
 
+  elapsedLabel(): string {
+    const seconds = this.recorder.elapsedSeconds();
+    const mm = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, '0');
+    const ss = (seconds % 60).toString().padStart(2, '0');
+    return `${mm}:${ss}`;
+  }
+
   submit(): void {
     if (!this.hasFiles || this.uploading()) {
       return;
     }
     this.uploading.set(true);
-    const files = this.selectedFiles().map(f => f.file);
+    const files = this.selectedFiles().map((f) => f.file);
 
     this.api.upload(files, this.caption().trim() || undefined).subscribe({
-      next: result => {
+      next: (result) => {
         this.uploading.set(false);
         if (result.failed.length > 0) {
-          this.snackBar.open(
-            `${result.uploaded.length} caricati, ${result.failed.length} falliti: ${result.failed[0].error}`,
-            'Chiudi',
-            { duration: 6000 }
+          this.toast.show(
+            `${result.uploaded.length} caricati, ${result.failed.length} non riusciti: ${result.failed[0].error}`,
+            6000,
           );
         } else {
-          this.snackBar.open('Caricamento completato!', 'Chiudi', { duration: 3000 });
+          this.toast.show('Grazie! Il tuo ricordo è nella galleria.');
         }
         if (result.uploaded.length > 0) {
+          const onlyAudio = files.every((file) => file.type.startsWith('audio/'));
           this.clearSelection();
-          this.router.navigate(['/galleria']);
+          this.router.navigate([onlyAudio ? '/voci' : '/galleria']);
         }
       },
       error: () => {
         this.uploading.set(false);
-        this.snackBar.open('Caricamento fallito, riprova.', 'Chiudi', { duration: 4000 });
-      }
+        this.toast.show('Caricamento non riuscito, riprova.');
+      },
     });
   }
 
   private addFiles(files: File[]): void {
-    const additions: SelectedFile[] = files.map(file => ({
+    const additions: SelectedFile[] = files.map((file) => ({
       file,
-      previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+      previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
     }));
-    this.selectedFiles.update(current => [...current, ...additions]);
+    this.selectedFiles.update((current) => [...current, ...additions]);
   }
 
   private clearSelection(): void {
-    this.selectedFiles().forEach(f => {
+    this.selectedFiles().forEach((f) => {
       if (f.previewUrl) {
         URL.revokeObjectURL(f.previewUrl);
       }

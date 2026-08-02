@@ -1,73 +1,87 @@
-<div class="upload-page">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Carica i tuoi ricordi</mat-card-title>
-      <mat-card-subtitle>Foto, video o un messaggio audio per gli sposi</mat-card-subtitle>
-    </mat-card-header>
+<section class="page page--nav upload">
 
-    <mat-card-content>
+  <header class="upload__head">
+    <span class="eyebrow">Il tuo contributo</span>
+    <h2 class="title">Carica i tuoi ricordi</h2>
+    <p class="lead">Foto, video o un messaggio audio: tutto finisce nella stessa galleria.</p>
+  </header>
 
-      <div class="actions-row">
-        <button mat-stroked-button (click)="fileInput.click()" [disabled]="recorder.recording()">
-          <mat-icon>add_photo_alternate</mat-icon>
-          Scegli foto o video
-        </button>
-        <input #fileInput type="file" multiple accept="image/*,video/*" hidden
-               (change)="onFilesPicked($event)">
+  <div class="upload__body">
 
-        @if (!recorder.recording()) {
-          <button mat-stroked-button (click)="startRecording()">
-            <mat-icon>mic</mat-icon>
-            Registra un audio
-          </button>
-        } @else {
-          <div class="recording-row">
-            <span class="recording-dot"></span>
-            <span>{{ recorder.elapsedSeconds() }}s</span>
-            <button mat-icon-button color="primary" (click)="stopRecording()" aria-label="Ferma e allega">
-              <mat-icon>stop_circle</mat-icon>
-            </button>
-            <button mat-icon-button (click)="cancelRecording()" aria-label="Annulla registrazione">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
-        }
+    <button class="drop" type="button" (click)="fileInput.click()" [disabled]="recorder.recording()">
+      <span class="drop__icon" aria-hidden="true">＋</span>
+      <span class="drop__title">Scegli foto o video</span>
+      <span class="drop__hint">Puoi selezionarne quante vuoi</span>
+    </button>
+    <input
+      #fileInput
+      type="file"
+      multiple
+      accept="image/*,video/*"
+      hidden
+      (change)="onFilesPicked($event)"
+    />
+
+    @if (!recorder.recording()) {
+      <button class="rec" type="button" (click)="startRecording()">
+        <span class="rec__icon" aria-hidden="true">◉</span>
+        <span class="rec__text">
+          <span class="rec__title">Registra un audio</span>
+          <span class="rec__hint">Due parole per gli sposi</span>
+        </span>
+      </button>
+    } @else {
+      <div class="rec rec--live">
+        <span class="rec__dot" aria-hidden="true"></span>
+        <span class="rec__text">
+          <span class="rec__title">Sto registrando…</span>
+          <span class="rec__timer">{{ elapsedLabel() }}</span>
+        </span>
+        <button class="rec__stop" type="button" (click)="stopRecording()" aria-label="Ferma e allega">■</button>
+        <button class="rec__cancel" type="button" (click)="cancelRecording()" aria-label="Annulla">✕</button>
       </div>
+    }
 
-      @if (hasFiles) {
-        <div class="preview-grid">
+    @if (hasFiles) {
+      <div class="picked">
+        <div class="picked__head">
+          <span class="field__label">Pronti da caricare</span>
+          <span class="picked__count">{{ selectedFiles().length }} file</span>
+        </div>
+
+        <div class="picked__grid">
           @for (item of selectedFiles(); track item.file.name + $index) {
-            <div class="preview-item">
+            <div class="thumb">
               @if (item.previewUrl) {
-                <img [src]="item.previewUrl" alt="">
+                <img [src]="item.previewUrl" alt="" />
               } @else {
-                <div class="preview-placeholder">
-                  <mat-icon>{{ item.file.type.startsWith('video/') ? 'videocam' : 'mic' }}</mat-icon>
-                </div>
+                <span class="thumb__kind">{{ isAudio(item) ? 'audio' : 'video' }}</span>
               }
-              <button mat-icon-button class="remove-btn" (click)="removeFile($index)" aria-label="Rimuovi">
-                <mat-icon>close</mat-icon>
-              </button>
-              <span class="filename">{{ item.file.name }}</span>
+              <button class="thumb__remove" type="button" (click)="removeFile($index)" aria-label="Rimuovi">✕</button>
+              <span class="thumb__name">{{ item.file.name }}</span>
             </div>
           }
         </div>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Aggiungi una didascalia (facoltativo)</mat-label>
-          <input matInput [(ngModel)]="caption" maxlength="300">
-        </mat-form-field>
+        <label class="field">
+          <span class="field__label">Didascalia</span>
+          <input
+            type="text"
+            maxlength="300"
+            placeholder="Due parole su questo momento…"
+            [ngModel]="caption()"
+            (ngModelChange)="caption.set($event)"
+          />
+        </label>
 
         @if (uploading()) {
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          <div class="bar"><span class="bar__fill"></span></div>
         }
 
-        <button mat-flat-button color="primary" class="full-width submit-btn"
-                (click)="submit()" [disabled]="uploading()">
-          Carica {{ selectedFiles().length }} file
+        <button class="btn btn--verde btn--block" type="button" (click)="submit()" [disabled]="uploading()">
+          {{ uploading() ? 'Caricamento…' : 'Carica ' + selectedFiles().length + ' file' }}
         </button>
-      }
-
-    </mat-card-content>
-  </mat-card>
-</div>
+      </div>
+    }
+  </div>
+</section>

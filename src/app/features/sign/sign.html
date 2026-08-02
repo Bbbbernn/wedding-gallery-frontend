@@ -1,33 +1,73 @@
-<div class="sign-page">
-  <mat-card class="sign-card">
-    <mat-card-header>
-      <mat-card-title>Benvenuto!</mat-card-title>
-      <mat-card-subtitle>Firmati per condividere le tue foto, video e audio del matrimonio</mat-card-subtitle>
-    </mat-card-header>
+@if (step() === 'welcome') {
+  <section class="welcome">
+    <div class="welcome__glow"></div>
+    <div class="welcome__ring welcome__ring--sm"></div>
+    <div class="welcome__ring welcome__ring--lg"></div>
 
-    <mat-card-content>
-      <form (ngSubmit)="submit()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Il tuo nome</mat-label>
-          <input matInput [(ngModel)]="displayName" name="displayName" maxlength="80" required
-                 placeholder="Es. Mario e Anna Rossi">
-        </mat-form-field>
+    <div class="welcome__body">
+      <img class="welcome__logo" src="logo-mr.png" alt="Michela e Roberto" />
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Un pensiero per gli sposi (facoltativo)</mat-label>
-          <textarea matInput [(ngModel)]="message" name="message" maxlength="500" rows="3"
-                    placeholder="Auguri..."></textarea>
-        </mat-form-field>
+      <div class="welcome__names">
+        <span class="eyebrow">Il matrimonio di</span>
+        <h1>Michela <em>e</em> Roberto</h1>
+      </div>
 
-        <button mat-flat-button color="primary" type="submit" class="full-width"
-                [disabled]="!canSubmit">
-          @if (submitting()) {
-            <mat-spinner diameter="20"></mat-spinner>
-          } @else {
-            Firma e continua
-          }
-        </button>
-      </form>
-    </mat-card-content>
-  </mat-card>
-</div>
+      <p class="welcome__claim">
+        Ogni foto che scatti oggi è un filo di questo intreccio. Lascia il tuo segno.
+      </p>
+
+      <button class="btn btn--lilla welcome__cta" type="button" (click)="step.set('form')">
+        Entra nella galleria <span aria-hidden="true">→</span>
+      </button>
+
+      <div class="welcome__date">05 · Settembre · 2026</div>
+    </div>
+  </section>
+} @else {
+  <section class="page sign">
+    <header class="hero-dark">
+      <img class="hero-dark__mark" src="logo-mr.png" alt="" />
+      <button class="btn--back" type="button" (click)="step.set('welcome')">← Indietro</button>
+      <h2 class="title">Lascia il tuo segno</h2>
+      <p class="lead">
+        Scrivi il tuo nome sul libro degli ospiti: da lì in poi la galleria è tua.
+      </p>
+    </header>
+
+    <form class="sign__form" (ngSubmit)="submit()">
+      <label class="field">
+        <span class="field__label">Il tuo nome</span>
+        <input
+          type="text"
+          name="displayName"
+          maxlength="80"
+          required
+          placeholder="Es. Mario e Anna Rossi"
+          [ngModel]="displayName()"
+          (ngModelChange)="displayName.set($event)"
+        />
+      </label>
+
+      <label class="field">
+        <span class="field__label">Un pensiero per gli sposi</span>
+        <textarea
+          name="message"
+          rows="4"
+          maxlength="500"
+          placeholder="Che la strada vi venga incontro…"
+          [ngModel]="message()"
+          (ngModelChange)="message.set($event)"
+        ></textarea>
+        <span class="field__hint">Facoltativo — finirà nel libro degli ospiti.</span>
+      </label>
+
+      <button class="btn btn--verde btn--block" type="submit" [disabled]="!canSubmit">
+        {{ submitting() ? 'Un attimo…' : 'Firma e entra' }}
+      </button>
+
+      <div class="divider"><img src="logo-mr.png" alt="" /></div>
+
+      <p class="sign__note">Nessuna registrazione, nessuna password.<br />Solo il tuo nome.</p>
+    </form>
+  </section>
+}

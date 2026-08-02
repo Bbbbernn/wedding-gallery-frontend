@@ -1,8 +1,4 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GalleryApiService } from '../../core/gallery-api.service';
 import { MediaItemResponse } from '../../core/models/media-item';
 import { MediaType } from '../../core/models/media-type';
@@ -10,18 +6,16 @@ import { MediaType } from '../../core/models/media-type';
 const PAGE_SIZE = 24;
 
 /**
- * Galleria condivisa: mostra i contributi di TUTTI gli invitati, con filtro per tipo
- * e caricamento a pagine successive ("carica altri").
+ * Galleria condivisa in masonry (colonne CSS) + visualizzatore a schermo intero.
+ * Gli audio non compaiono qui: hanno la loro sezione "Voci".
  */
 @Component({
   selector: 'app-gallery',
-  standalone: true,
-  imports: [MatButtonModule, MatButtonToggleModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [],
   templateUrl: './gallery.html',
-  styleUrl: './gallery.scss'
+  styleUrl: './gallery.scss',
 })
 export class Gallery implements OnInit {
-
   private readonly api = inject(GalleryApiService);
 
   readonly items = signal<MediaItemResponse[]>([]);
@@ -30,6 +24,13 @@ export class Gallery implements OnInit {
   readonly filterType = signal<MediaType | null>(null);
   readonly page = signal(0);
   readonly hasMore = signal(true);
+  readonly viewerIndex = signal<number | null>(null);
+
+  readonly filters: { key: MediaType | null; label: string }[] = [
+    { key: null, label: 'Tutti' },
+    { key: 'PHOTO', label: 'Foto' },
+    { key: 'VIDEO', label: 'Video' },
+  ];
 
   ngOnInit(): void {
     this.loadFirstPage();
@@ -44,12 +45,12 @@ export class Gallery implements OnInit {
     this.loading.set(true);
     this.page.set(0);
     this.api.listMedia(0, PAGE_SIZE, this.filterType()).subscribe({
-      next: result => {
-        this.items.set(result.content);
+      next: (result) => {
+        this.items.set(this.withoutAudio(result.content));
         this.hasMore.set(!result.last);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false)
+      error: () => this.loading.set(false),
     });
   }
 
@@ -60,19 +61,44 @@ export class Gallery implements OnInit {
     this.loadingMore.set(true);
     const nextPage = this.page() + 1;
     this.api.listMedia(nextPage, PAGE_SIZE, this.filterType()).subscribe({
-      next: result => {
-        this.items.update(current => [...current, ...result.content]);
+      next: (result) => {
+        this.items.update((current) => [...current, ...this.withoutAudio(result.content)]);
         this.page.set(nextPage);
         this.hasMore.set(!result.last);
         this.loadingMore.set(false);
       },
-      error: () => this.loadingMore.set(false)
+      error: () => this.loadingMore.set(false),
     });
   }
 
+  openViewer(index: number): void {
+    if (this.items()[index]?.mediaType === 'PHOTO') {
+      this.viewerIndex.set(index);
+    }
+  }
+
+  closeViewer(): void {
+    this.viewerIndex.set(null);
+  }
+
+  step(delta: number): void {
+    const current = this.viewerIndex();
+    if (current === null) {
+      return;
+    }
+    const next = current + delta;
+    if (next >= 0 && next < this.items().length) {
+      this.viewerIndex.set(next);
+    }
+  }
+
+  get viewerItem(): MediaItemResponse | null {
+    const index = this.viewerIndex();
+    return index === null ? null : (this.items()[index] ?? null);
+  }
+
   thumbnailFor(item: MediaItemResponse): string {
-    const url = item.thumbnailUrl ?? item.contentUrl;
-    return this.api.contentUrl(url);
+    return this.api.contentUrl(item.thumbnailUrl ?? item.contentUrl);
   }
 
   contentFor(item: MediaItemResponse): string {
@@ -81,5 +107,9 @@ export class Gallery implements OnInit {
 
   downloadFor(item: MediaItemResponse): string {
     return this.api.contentUrl(item.downloadUrl);
+  }
+
+  private withoutAudio(items: MediaItemResponse[]): MediaItemResponse[] {
+    return items.filter((item) => item.mediaType !== 'AUDIO');
   }
 }

@@ -1,0 +1,117 @@
+.voices { background: #f2edf7; }
+
+.voices__hero {
+  background: var(--viola);
+  color: var(--avorio);
+  padding: 26px var(--pad-x) 30px;
+  border-radius: 0 0 28px 28px;
+  position: relative;
+  overflow: hidden;
+
+  .eyebrow { color: #cdbde4; }
+  .title { color: var(--avorio); }
+  .lead { color: rgba(247, 243, 236, 0.7); max-width: 32ch; }
+}
+.voices__hero::after {
+  content: '';
+  position: absolute;
+  left: -50px;
+  bottom: -70px;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  border: 1px solid rgba(247, 243, 236, 0.16);
+}
+
+.voices__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px var(--pad-x) 0;
+}
+
+.voices__empty {
+  margin: 30px 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: #9a8fad;
+}
+
+.voice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--carta);
+  border: 1px solid var(--lilla-bordo);
+  border-radius: 20px;
+  padding: 14px 15px;
+}
+
+.voice__play {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--lilla-soft);
+  color: var(--viola);
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.voice__play--on { background: var(--viola); color: var(--avorio); }
+
+.voice__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+
+.voice__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.voice__guest {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3a2f4e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.voice__meta { flex: 0 0 auto; font-size: 11.5px; color: #9a8fad; }
+
+.voice__wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 26px;
+}
+.voice__bar {
+  flex: 1;
+  border-radius: 2px;
+  background: #d5c7e6;
+  transition: background 0.15s linear;
+}
+.voice__bar--on { background: var(--viola); }
+
+.voice__caption {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #8b829b;
+  font-style: italic;
+}
+
+.voices__cta {
+  margin: 24px var(--pad-x) 0;
+  border: 1.5px dashed #c9b8e0;
+  border-radius: 20px;
+  padding: 22px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  p { margin: 0; font-family: var(--serif); font-size: 17px; color: var(--viola); }
+}
