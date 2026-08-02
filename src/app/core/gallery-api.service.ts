@@ -31,6 +31,14 @@ export class GalleryApiService {
     return this.http.post<GuestRegisteredResponse>(`${this.baseUrl}/guests`, request);
   }
 
+  /**
+   * Verifica che il token salvato nel browser corrisponda ancora a un invitato reale.
+   * L'header X-Guest-Token viene allegato automaticamente dall'interceptor.
+   */
+  me(): Observable<GuestResponse> {
+    return this.http.get<GuestResponse>(`${this.baseUrl}/guests/me`);
+  }
+
   listGuests(): Observable<GuestResponse[]> {
     return this.http.get<GuestResponse[]>(`${this.baseUrl}/guests`);
   }
