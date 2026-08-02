@@ -4,6 +4,10 @@
    ============================================================ */
 
 :root {
+  /* Palette pensata per lo schema chiaro: si dice al browser di non reinterpretarla
+     quando il telefono e' in modalita' notte (vedi anche il meta in index.html). */
+  color-scheme: only light;
+
   --verde: #39463d;
   --verde-scuro: #26302a;
   --verde-2: #4a5a4f;
@@ -55,6 +59,19 @@ a:hover { color: var(--lilla); }
 
 input, textarea, button, select { font: inherit; color: inherit; }
 input:focus, textarea:focus { outline: none; }
+
+/* I due punti in cui il sistema operativo entra comunque nei campi di testo:
+   il placeholder e il riempimento automatico (che su iOS e Chrome sostituisce
+   lo sfondo con un colore proprio, illeggibile sopra l'avorio). */
+::placeholder { color: var(--muted-2); opacity: 1; }
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--testo);
+  -webkit-box-shadow: 0 0 0 1000px var(--carta) inset;
+  caret-color: var(--testo);
+}
 button { cursor: pointer; }
 
 /* ---------- guscio dell'app: colonna centrata su qualsiasi schermo ---------- */
