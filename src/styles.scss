@@ -21,6 +21,7 @@
   --testo: #23282b;
   --muted: #8c857a;
   --muted-2: #9a9287;
+  --logo-mask: url('/logo-mr.png');
 
   --r-lg: 22px;
   --r-md: 18px;
@@ -202,8 +203,17 @@ button { cursor: pointer; }
   right: -26px;
   top: -18px;
   width: 150px;
-  filter: invert(1);
-  opacity: 0.09;
+  height: 150px;
+  background: var(--lilla);
+  -webkit-mask-image: var(--logo-mask, none);
+  mask-image: var(--logo-mask, none);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  opacity: 0.9;
   pointer-events: none;
 }
 .hero-dark > *:not(.hero-dark__mark) { position: relative; }
