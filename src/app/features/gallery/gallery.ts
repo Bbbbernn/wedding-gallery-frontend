@@ -76,9 +76,7 @@ export class Gallery implements OnInit {
   }
 
   openViewer(index: number): void {
-    if (this.items()[index]?.mediaType === 'PHOTO') {
-      this.viewerIndex.set(index);
-    }
+    this.viewerIndex.set(index);
   }
 
   closeViewer(): void {

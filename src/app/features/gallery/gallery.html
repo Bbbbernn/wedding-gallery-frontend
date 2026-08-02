@@ -42,7 +42,7 @@
               @if (item.mediaType === 'PHOTO') {
                 <img [src]="thumbnailFor(item)" [alt]="item.originalFilename" loading="lazy" decoding="async" />
               } @else {
-                <video [src]="contentFor(item)" preload="metadata" controls playsinline></video>
+                <video [src]="contentFor(item)" preload="metadata" muted playsinline></video>
                 <span class="tile__badge">▶</span>
               }
             </div>
@@ -81,7 +81,13 @@
       </div>
 
       <div class="viewer__stage">
-        <img [src]="contentFor(item)" [alt]="item.originalFilename" />
+        @for (current of [item]; track current.id) {
+          @if (current.mediaType === 'PHOTO') {
+            <img [src]="contentFor(current)" [alt]="current.originalFilename" />
+          } @else {
+            <video [src]="contentFor(current)" controls playsinline autoplay></video>
+          }
+        }
       </div>
 
       <div class="viewer__foot">
