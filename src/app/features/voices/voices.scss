@@ -12,6 +12,11 @@
   .title { color: var(--avorio); }
   .lead { color: rgba(247, 243, 236, 0.7); max-width: 32ch; }
 }
+/* Il monogramma usa la stessa classe dell'header di firma (definita in styles.scss):
+   stesso colore, stessa misura, stessa posizione. Qui serve solo assicurarsi che il
+   testo resti sopra agli elementi decorativi posizionati. */
+.voices__hero > *:not(.hero-dark__mark) { position: relative; }
+
 .voices__hero::after {
   content: '';
   position: absolute;
