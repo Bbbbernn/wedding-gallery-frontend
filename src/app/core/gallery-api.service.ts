@@ -3,7 +3,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from './environment';
 import { GuestRegisteredResponse, GuestResponse, GuestSignRequest } from './models/guest';
-import { MediaItemResponse, MediaStatsResponse, MediaUploadResponse, PageResponse } from './models/media-item';
+import {
+  MediaItemResponse,
+  MediaStatsResponse,
+  MediaUploadResponse,
+  PageResponse,
+} from './models/media-item';
 import { MediaType } from './models/media-type';
 import { GuestSessionService } from './guest-session.service';
 
@@ -13,11 +18,12 @@ import { GuestSessionService } from './guest-session.service';
  */
 @Injectable({ providedIn: 'root' })
 export class GalleryApiService {
-
   private readonly baseUrl = environment.apiBaseUrl;
 
-  constructor(private readonly http: HttpClient, private readonly session: GuestSessionService) {
-  }
+  constructor(
+    private readonly http: HttpClient,
+    private readonly session: GuestSessionService,
+  ) {}
 
   // ---------------- firma ----------------
 
@@ -31,7 +37,11 @@ export class GalleryApiService {
 
   // ---------------- galleria ----------------
 
-  listMedia(page: number, size: number, type?: MediaType | null): Observable<PageResponse<MediaItemResponse>> {
+  listMedia(
+    page: number,
+    size: number,
+    type?: MediaType | null,
+  ): Observable<PageResponse<MediaItemResponse>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (type) {
       params = params.set('type', type);
@@ -47,14 +57,26 @@ export class GalleryApiService {
 
   upload(files: File[], caption?: string): Observable<MediaUploadResponse> {
     const formData = new FormData();
-    files.forEach(file => formData.append('files', file));
+    files.forEach((file) => formData.append('files', file));
     if (caption) {
       formData.append('caption', caption);
     }
     const headers = new HttpHeaders(
-      this.session.token ? { 'X-Guest-Token': this.session.token } : {}
+      this.session.token ? { 'X-Guest-Token': this.session.token } : {},
     );
     return this.http.post<MediaUploadResponse>(`${this.baseUrl}/media`, formData, { headers });
+  }
+
+  /**
+   * Cancella un proprio contenuto. Il backend verifica il possesso lato server
+   * (403 se il file non appartiene all'invitato del token): qui non serve
+   * ripetere quel controllo, solo mostrare l'azione ai file giusti (vedi Gallery).
+   */
+  deleteMedia(id: string): Observable<void> {
+    const headers = new HttpHeaders(
+      this.session.token ? { 'X-Guest-Token': this.session.token } : {},
+    );
+    return this.http.delete<void>(`${this.baseUrl}/media/${id}`, { headers });
   }
 
   // ---------------- URL diretti (img src, download, ecc.) ----------------

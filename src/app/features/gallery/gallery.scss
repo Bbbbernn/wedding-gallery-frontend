@@ -164,6 +164,46 @@
 }
 .viewer__pos { font-size: 12px; color: rgba(247, 243, 236, 0.55); }
 
+.viewer__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(21, 30, 26, 0.72);
+  backdrop-filter: blur(2px);
+}
+.confirm__card {
+  width: 100%;
+  max-width: 320px;
+  background: var(--carta);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+.confirm__text {
+  margin: 0;
+  color: var(--testo);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.confirm__actions {
+  display: flex;
+  gap: 10px;
+}
+.confirm__actions .btn { flex: 1; min-height: 46px; font-size: 14px; }
+
 .viewer__stage {
   flex: 1;
   display: flex;

@@ -15,7 +15,6 @@ interface StoredGuest {
  */
 @Injectable({ providedIn: 'root' })
 export class GuestSessionService {
-
   private readonly guestSignal = signal<StoredGuest | null>(this.readFromStorage());
 
   readonly guest = this.guestSignal.asReadonly();
@@ -28,6 +27,10 @@ export class GuestSessionService {
     return this.guestSignal()?.token ?? null;
   }
 
+  get id(): string | null {
+    return this.guestSignal()?.id ?? null;
+  }
+
   get displayName(): string | null {
     return this.guestSignal()?.displayName ?? null;
   }
@@ -36,7 +39,7 @@ export class GuestSessionService {
     const stored: StoredGuest = {
       id: response.id,
       displayName: response.displayName,
-      token: response.token
+      token: response.token,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
     this.guestSignal.set(stored);

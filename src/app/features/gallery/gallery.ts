@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { GalleryApiService } from '../../core/gallery-api.service';
+import { GuestSessionService } from '../../core/guest-session.service';
 import { MediaItemResponse } from '../../core/models/media-item';
 import { MediaType } from '../../core/models/media-type';
 
@@ -17,6 +18,7 @@ const PAGE_SIZE = 24;
 })
 export class Gallery implements OnInit {
   private readonly api = inject(GalleryApiService);
+  private readonly session = inject(GuestSessionService);
 
   readonly items = signal<MediaItemResponse[]>([]);
   readonly loading = signal(false);
@@ -25,6 +27,8 @@ export class Gallery implements OnInit {
   readonly page = signal(0);
   readonly hasMore = signal(true);
   readonly viewerIndex = signal<number | null>(null);
+  readonly deleting = signal(false);
+  readonly confirmingDelete = signal(false);
 
   readonly filters: { key: MediaType | null; label: string }[] = [
     { key: null, label: 'Tutti' },
@@ -79,6 +83,7 @@ export class Gallery implements OnInit {
 
   closeViewer(): void {
     this.viewerIndex.set(null);
+    this.confirmingDelete.set(false);
   }
 
   step(delta: number): void {
@@ -89,12 +94,46 @@ export class Gallery implements OnInit {
     const next = current + delta;
     if (next >= 0 && next < this.items().length) {
       this.viewerIndex.set(next);
+      this.confirmingDelete.set(false);
     }
   }
 
   get viewerItem(): MediaItemResponse | null {
     const index = this.viewerIndex();
     return index === null ? null : (this.items()[index] ?? null);
+  }
+
+  /** Il pulsante di cancellazione compare solo sui contenuti caricati da questo stesso invitato. */
+  isMine(item: MediaItemResponse): boolean {
+    return !!this.session.id && item.guestId === this.session.id;
+  }
+
+  askDelete(): void {
+    this.confirmingDelete.set(true);
+  }
+
+  cancelDelete(): void {
+    this.confirmingDelete.set(false);
+  }
+
+  deleteCurrent(): void {
+    const item = this.viewerItem;
+    if (!item || this.deleting()) {
+      return;
+    }
+    this.deleting.set(true);
+    this.api.deleteMedia(item.id).subscribe({
+      next: () => {
+        this.items.update((current) => current.filter((i) => i.id !== item.id));
+        this.deleting.set(false);
+        this.confirmingDelete.set(false);
+        this.closeViewer();
+      },
+      error: () => {
+        this.deleting.set(false);
+        this.confirmingDelete.set(false);
+      },
+    });
   }
 
   thumbnailFor(item: MediaItemResponse): string {

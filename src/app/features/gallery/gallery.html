@@ -72,7 +72,12 @@
       <div class="viewer__bar">
         <button class="viewer__btn" type="button" (click)="closeViewer()" aria-label="Chiudi">✕</button>
         <span class="viewer__pos">{{ (viewerIndex() ?? 0) + 1 }} / {{ items().length }}</span>
-        <a class="viewer__btn" [href]="downloadFor(item)" download aria-label="Scarica">↓</a>
+        <div class="viewer__actions">
+          @if (isMine(item)) {
+            <button class="viewer__btn" type="button" (click)="askDelete()" aria-label="Elimina">🗑</button>
+          }
+          <a class="viewer__btn" [href]="downloadFor(item)" download aria-label="Scarica">↓</a>
+        </div>
       </div>
 
       <div class="viewer__stage">
@@ -89,6 +94,22 @@
           <button type="button" (click)="step(1)" [disabled]="(viewerIndex() ?? 0) >= items().length - 1">Successiva →</button>
         </div>
       </div>
+
+      @if (confirmingDelete()) {
+        <div class="confirm" role="alertdialog" aria-modal="true">
+          <div class="confirm__card">
+            <p class="confirm__text">Eliminare questo ricordo? Non si può annullare.</p>
+            <div class="confirm__actions">
+              <button class="btn btn--ghost" type="button" (click)="cancelDelete()" [disabled]="deleting()">
+                Annulla
+              </button>
+              <button class="btn btn--verde" type="button" (click)="deleteCurrent()" [disabled]="deleting()">
+                {{ deleting() ? 'Un attimo…' : 'Elimina' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   }
 </section>
