@@ -74,12 +74,25 @@
           />
         </label>
 
-        @if (uploading()) {
+        @if (preparing() && compressor.currentFile(); as name) {
+          <p class="prep">Sto alleggerendo {{ name }} — {{ compressor.progress() }}%</p>
+        }
+
+        @if (uploading() || preparing()) {
           <div class="bar"><span class="bar__fill"></span></div>
         }
 
-        <button class="btn btn--verde btn--block" type="button" (click)="submit()" [disabled]="uploading()">
-          {{ uploading() ? 'Caricamento…' : 'Carica ' + selectedFiles().length + ' file' }}
+        <button
+          class="btn btn--verde btn--block"
+          type="button"
+          (click)="submit()"
+          [disabled]="uploading() || preparing()"
+        >
+          @if (preparing()) {
+            Preparazione…
+          } @else {
+            {{ uploading() ? 'Caricamento…' : 'Carica ' + selectedFiles().length + ' file' }}
+          }
         </button>
       </div>
     }

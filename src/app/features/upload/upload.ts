@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { GalleryApiService } from '../../core/gallery-api.service';
 import { ToastService } from '../../core/toast.service';
 import { AudioRecorderService } from './audio-recorder.service';
+import { VideoCompressorService } from './video-compressor.service';
 
 interface SelectedFile {
   file: File;
@@ -17,7 +18,7 @@ interface SelectedFile {
 @Component({
   selector: 'app-upload',
   imports: [FormsModule],
-  providers: [AudioRecorderService],
+  providers: [AudioRecorderService, VideoCompressorService],
   templateUrl: './upload.html',
   styleUrl: './upload.scss',
 })
@@ -26,12 +27,14 @@ export class Upload {
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
   readonly recorder = inject(AudioRecorderService);
+  readonly compressor = inject(VideoCompressorService);
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
 
   readonly selectedFiles = signal<SelectedFile[]>([]);
   readonly caption = signal('');
   readonly uploading = signal(false);
+  readonly preparing = signal(false);
 
   get hasFiles(): boolean {
     return this.selectedFiles().length > 0;
@@ -85,12 +88,25 @@ export class Upload {
     return `${mm}:${ss}`;
   }
 
-  submit(): void {
-    if (!this.hasFiles || this.uploading()) {
+  /**
+   * Prima di caricare, i video pesanti vengono ricompressi sul telefono (vedi
+   * VideoCompressorService). I file non video, o quelli per cui la compressione non
+   * e' possibile, proseguono invariati: l'upload non viene mai bloccato da questo passo.
+   */
+  async submit(): Promise<void> {
+    if (!this.hasFiles || this.uploading() || this.preparing()) {
       return;
     }
+
+    this.preparing.set(true);
+    const files: File[] = [];
+    for (const selected of this.selectedFiles()) {
+      const result = await this.compressor.compress(selected.file);
+      files.push(result.file);
+    }
+    this.preparing.set(false);
+
     this.uploading.set(true);
-    const files = this.selectedFiles().map((f) => f.file);
 
     this.api.upload(files, this.caption().trim() || undefined).subscribe({
       next: (result) => {
