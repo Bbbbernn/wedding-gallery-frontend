@@ -211,8 +211,23 @@
   justify-content: center;
   padding: 0 14px;
   min-height: 0;
+  overflow: hidden;
 
-  img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 20px; }
+  /* Foto e video seguono la stessa regola: senza questa il <video> usava le proprie
+     dimensioni intrinseche (es. 1920x1080) e straripava dal palco, dando l'effetto
+     "zoom estremo". width/height auto lasciano decidere al rapporto originale,
+     i max-* fanno da gabbia. */
+  img, video {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 20px;
+  }
+
+  video { background: #000; }
 }
 
 .viewer__foot {
