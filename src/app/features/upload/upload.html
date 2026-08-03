@@ -90,11 +90,7 @@
           (click)="submit()"
           [disabled]="uploading() || preparing()"
         >
-          @if (preparing()) {
-            Preparazione…
-          } @else {
-            {{ uploading() ? 'Caricamento…' : 'Carica ' + selectedFiles().length + ' file' }}
-          }
+          {{ uploadLabel() }}
         </button>
       </div>
     }
