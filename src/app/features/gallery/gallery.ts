@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DOCUMENT, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { GalleryApiService } from '../../core/gallery-api.service';
 import { GuestSessionService } from '../../core/guest-session.service';
 import { MediaItemResponse } from '../../core/models/media-item';
@@ -16,9 +16,10 @@ const PAGE_SIZE = 24;
   templateUrl: './gallery.html',
   styleUrl: './gallery.scss',
 })
-export class Gallery implements OnInit {
+export class Gallery implements OnInit, OnDestroy {
   private readonly api = inject(GalleryApiService);
   private readonly session = inject(GuestSessionService);
+  private readonly document = inject(DOCUMENT);
 
   readonly items = signal<MediaItemResponse[]>([]);
   readonly loading = signal(false);
@@ -30,6 +31,10 @@ export class Gallery implements OnInit {
   readonly deleting = signal(false);
   readonly confirmingDelete = signal(false);
 
+  /** Valori originali di overflow, ripristinati alla chiusura del visualizzatore. */
+  private previousHtmlOverflow: string | null = null;
+  private previousBodyOverflow: string | null = null;
+
   readonly filters: { key: MediaType | null; label: string }[] = [
     { key: null, label: 'Tutti' },
     { key: 'PHOTO', label: 'Foto' },
@@ -38,6 +43,11 @@ export class Gallery implements OnInit {
 
   ngOnInit(): void {
     this.loadFirstPage();
+  }
+
+  /** Se si lascia la pagina con il visualizzatore aperto, lo scroll va comunque sbloccato. */
+  ngOnDestroy(): void {
+    this.unlockScroll();
   }
 
   onFilterChange(type: MediaType | null): void {
@@ -77,11 +87,42 @@ export class Gallery implements OnInit {
 
   openViewer(index: number): void {
     this.viewerIndex.set(index);
+    this.lockScroll();
   }
 
   closeViewer(): void {
     this.viewerIndex.set(null);
     this.confirmingDelete.set(false);
+    this.unlockScroll();
+  }
+
+  /**
+   * Il visualizzatore e' in position: fixed e copre tutto, ma senza questo blocco
+   * il trascinamento del dito arriva comunque alla pagina sotto e la galleria
+   * continua a scorrere dietro la foto. overflow: hidden su <html> e <body> ferma
+   * lo scroll mantenendo la posizione: alla chiusura si ritrova il punto in cui
+   * si era, cosa che il trucco con position: fixed sul body farebbe perdere.
+   */
+  private lockScroll(): void {
+    if (this.previousBodyOverflow !== null) {
+      return;
+    }
+    const html = this.document.documentElement;
+    const body = this.document.body;
+    this.previousHtmlOverflow = html.style.overflow;
+    this.previousBodyOverflow = body.style.overflow;
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+  }
+
+  private unlockScroll(): void {
+    if (this.previousBodyOverflow === null) {
+      return;
+    }
+    this.document.documentElement.style.overflow = this.previousHtmlOverflow ?? '';
+    this.document.body.style.overflow = this.previousBodyOverflow ?? '';
+    this.previousHtmlOverflow = null;
+    this.previousBodyOverflow = null;
   }
 
   step(delta: number): void {
