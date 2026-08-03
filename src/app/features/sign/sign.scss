@@ -89,6 +89,14 @@
 
 .sign { display: flex; flex-direction: column; background: var(--avorio); }
 
+/* L'header e il pulsante di ingresso usano lo stesso verde della schermata di
+   benvenuto (--verde) invece del verde scuro di default, cosi' il passaggio
+   "Entra nella galleria" -> firma non cambia tonalita'. Gli stili sono di
+   componente: .hero-dark e .btn--verde restano invariati nelle altre pagine
+   (upload, galleria). */
+.sign .hero-dark { background: var(--verde); }
+.sign .btn--verde { background: var(--verde); }
+
 .sign__form {
   flex: 1;
   display: flex;
