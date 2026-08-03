@@ -6,6 +6,9 @@ import { MediaType } from '../../core/models/media-type';
 
 const PAGE_SIZE = 24;
 
+/** Tipi mostrati in galleria con il filtro "Tutti": gli audio stanno nella sezione Voci. */
+const GALLERY_TYPES: MediaType[] = ['PHOTO', 'VIDEO'];
+
 /**
  * Galleria condivisa in masonry (colonne CSS) + visualizzatore a schermo intero.
  * Gli audio non compaiono qui: hanno la loro sezione "Voci".
@@ -57,9 +60,9 @@ export class Gallery implements OnInit, OnDestroy {
   loadFirstPage(): void {
     this.loading.set(true);
     this.page.set(0);
-    this.api.listMedia(0, PAGE_SIZE, this.filterType()).subscribe({
+    this.api.listMedia(0, PAGE_SIZE, this.filterType(), this.typesFilter()).subscribe({
       next: (result) => {
-        this.items.set(this.withoutAudio(result.content));
+        this.items.set(result.content);
         this.hasMore.set(!result.last);
         this.loading.set(false);
       },
@@ -73,9 +76,9 @@ export class Gallery implements OnInit, OnDestroy {
     }
     this.loadingMore.set(true);
     const nextPage = this.page() + 1;
-    this.api.listMedia(nextPage, PAGE_SIZE, this.filterType()).subscribe({
+    this.api.listMedia(nextPage, PAGE_SIZE, this.filterType(), this.typesFilter()).subscribe({
       next: (result) => {
-        this.items.update((current) => [...current, ...this.withoutAudio(result.content)]);
+        this.items.update((current) => [...current, ...result.content]);
         this.page.set(nextPage);
         this.hasMore.set(!result.last);
         this.loadingMore.set(false);
@@ -195,7 +198,11 @@ export class Gallery implements OnInit, OnDestroy {
     return this.api.contentUrl(item.downloadUrl);
   }
 
-  private withoutAudio(items: MediaItemResponse[]): MediaItemResponse[] {
-    return items.filter((item) => item.mediaType !== 'AUDIO');
+  /**
+   * Con un filtro attivo basta "type"; con "Tutti" si chiedono esplicitamente foto e
+   * video, altrimenti il backend restituirebbe anche gli audio.
+   */
+  private typesFilter(): MediaType[] | null {
+    return this.filterType() ? null : GALLERY_TYPES;
   }
 }

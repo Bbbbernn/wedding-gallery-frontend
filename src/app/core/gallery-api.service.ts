@@ -41,14 +41,23 @@ export class GalleryApiService {
 
   // ---------------- galleria ----------------
 
+  /**
+   * "type" chiede un tipo solo, "types" ne ammette piu' d'uno (parametro ripetuto:
+   * types=PHOTO&types=VIDEO). Serve alla galleria per escludere gli audio a monte,
+   * cosi' e' il database a paginare gia' senza di loro.
+   */
   listMedia(
     page: number,
     size: number,
     type?: MediaType | null,
+    types?: MediaType[] | null,
   ): Observable<PageResponse<MediaItemResponse>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (type) {
       params = params.set('type', type);
+    }
+    for (const value of types ?? []) {
+      params = params.append('types', value);
     }
     return this.http.get<PageResponse<MediaItemResponse>>(`${this.baseUrl}/media`, { params });
   }
