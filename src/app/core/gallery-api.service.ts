@@ -39,10 +39,6 @@ export class GalleryApiService {
     return this.http.get<GuestResponse>(`${this.baseUrl}/guests/me`);
   }
 
-  listGuests(): Observable<GuestResponse[]> {
-    return this.http.get<GuestResponse[]>(`${this.baseUrl}/guests`);
-  }
-
   // ---------------- galleria ----------------
 
   listMedia(
