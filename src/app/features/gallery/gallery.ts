@@ -31,9 +31,8 @@ export class Gallery implements OnInit, OnDestroy {
   readonly deleting = signal(false);
   readonly confirmingDelete = signal(false);
 
-  /** Valori originali di overflow, ripristinati alla chiusura del visualizzatore. */
-  private previousHtmlOverflow: string | null = null;
-  private previousBodyOverflow: string | null = null;
+  /** Posizione della galleria al momento dell'apertura, da ripristinare alla chiusura. */
+  private lockedScrollY: number | null = null;
 
   readonly filters: { key: MediaType | null; label: string }[] = [
     { key: null, label: 'Tutti' },
@@ -97,32 +96,41 @@ export class Gallery implements OnInit, OnDestroy {
   }
 
   /**
-   * Il visualizzatore e' in position: fixed e copre tutto, ma senza questo blocco
-   * il trascinamento del dito arriva comunque alla pagina sotto e la galleria
-   * continua a scorrere dietro la foto. overflow: hidden su <html> e <body> ferma
-   * lo scroll mantenendo la posizione: alla chiusura si ritrova il punto in cui
-   * si era, cosa che il trucco con position: fixed sul body farebbe perdere.
+   * Il solo overflow: hidden non basta sui browser mobili: il trascinamento
+   * arriva comunque al documento e la galleria continua a scorrere dietro la
+   * foto, spuntando in fondo allo schermo quando la barra degli indirizzi si
+   * ritrae. Qui il body viene tolto dal flusso (position: fixed) e traslato di
+   * -scrollY: la pagina non ha piu' nulla da scorrere. La posizione viene
+   * salvata e ripristinata a mano alla chiusura, cosi' si torna esattamente al
+   * punto della griglia in cui si era.
    */
   private lockScroll(): void {
-    if (this.previousBodyOverflow !== null) {
+    if (this.lockedScrollY !== null) {
       return;
     }
-    const html = this.document.documentElement;
     const body = this.document.body;
-    this.previousHtmlOverflow = html.style.overflow;
-    this.previousBodyOverflow = body.style.overflow;
-    html.style.overflow = 'hidden';
+    this.lockedScrollY = this.document.defaultView?.scrollY ?? 0;
+    body.style.position = 'fixed';
+    body.style.top = `-${this.lockedScrollY}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
     body.style.overflow = 'hidden';
   }
 
   private unlockScroll(): void {
-    if (this.previousBodyOverflow === null) {
+    if (this.lockedScrollY === null) {
       return;
     }
-    this.document.documentElement.style.overflow = this.previousHtmlOverflow ?? '';
-    this.document.body.style.overflow = this.previousBodyOverflow ?? '';
-    this.previousHtmlOverflow = null;
-    this.previousBodyOverflow = null;
+    const body = this.document.body;
+    body.style.position = '';
+    body.style.top = '';
+    body.style.left = '';
+    body.style.right = '';
+    body.style.width = '';
+    body.style.overflow = '';
+    this.document.defaultView?.scrollTo(0, this.lockedScrollY);
+    this.lockedScrollY = null;
   }
 
   step(delta: number): void {
