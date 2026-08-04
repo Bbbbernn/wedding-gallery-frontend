@@ -24,7 +24,6 @@
       <button
         type="button"
         class="chip gallery__select"
-        [class.chip--on]="selectionMode()"
         (click)="toggleSelectionMode()"
       >
         {{ selectionMode() ? 'Annulla' : 'Seleziona' }}

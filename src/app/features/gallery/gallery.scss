@@ -260,12 +260,16 @@
 
 /* Ultimo elemento della riga dei filtri, spinto tutto a destra.
    position: sticky lo tiene visibile anche se i filtri dovessero
-   scorrere in orizzontale su schermi molto stretti. */
+   scorrere in orizzontale su schermi molto stretti; lo sfondo pieno
+   serve a non far passare i filtri sotto di lui mentre scorrono ed e'
+   lo stesso di un chip non selezionato. Il pulsante NON usa mai
+   .chip--on: resta sempre con l'aspetto neutro, sia che dica
+   "Seleziona" sia che dica "Annulla". */
 .gallery__select {
   margin-left: auto;
   position: sticky;
   right: 0;
-  background: var(--avorio);
+  background: var(--carta);
 }
 
 .tile__check {
