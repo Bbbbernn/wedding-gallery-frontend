@@ -9,15 +9,6 @@
       </div>
     </div>
 
-    <button
-      type="button"
-      class="chip gallery__select"
-      [class.chip--on]="selectionMode()"
-      (click)="toggleSelectionMode()"
-    >
-      {{ selectionMode() ? 'Annulla' : 'Seleziona' }}
-    </button>
-
     <div class="gallery__chips">
       @for (filter of filters; track filter.label) {
         <button
@@ -29,6 +20,15 @@
           {{ filter.label }}
         </button>
       }
+
+      <button
+        type="button"
+        class="chip gallery__select"
+        [class.chip--on]="selectionMode()"
+        (click)="toggleSelectionMode()"
+      >
+        {{ selectionMode() ? 'Annulla' : 'Seleziona' }}
+      </button>
     </div>
   </header>
 

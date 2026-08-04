@@ -258,7 +258,15 @@
 
 /* ---- Selezione multipla e download in ZIP ---- */
 
-.gallery__select { margin-left: auto; }
+/* Ultimo elemento della riga dei filtri, spinto tutto a destra.
+   position: sticky lo tiene visibile anche se i filtri dovessero
+   scorrere in orizzontale su schermi molto stretti. */
+.gallery__select {
+  margin-left: auto;
+  position: sticky;
+  right: 0;
+  background: var(--avorio);
+}
 
 .tile__check {
   position: absolute;
