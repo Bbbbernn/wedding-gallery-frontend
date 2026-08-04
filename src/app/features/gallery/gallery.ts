@@ -132,6 +132,8 @@ export class Gallery implements OnInit, OnDestroy {
   /**
    * Il download parte come navigazione verso l'URL dello ZIP: il browser lo tratta come
    * un file da salvare (Content-Disposition: attachment) e la pagina resta dov'e'.
+   * Subito dopo la selezione viene svuotata e la galleria torna normale: lasciare i
+   * contenuti ancora spuntati farebbe credere che ci sia altro da scaricare.
    */
   downloadSelection(): void {
     const ids = this.selection();
@@ -140,6 +142,8 @@ export class Gallery implements OnInit, OnDestroy {
     }
     this.toast.show('Preparo il file da scaricare…');
     this.document.defaultView?.location.assign(this.api.archiveUrl(ids));
+    this.selection.set([]);
+    this.selectionMode.set(false);
   }
 
   openViewer(index: number): void {
