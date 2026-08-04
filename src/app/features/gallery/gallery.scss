@@ -255,3 +255,47 @@
   }
   button:disabled { opacity: 0.35; }
 }
+
+/* ---- Selezione multipla e download in ZIP ---- */
+
+.gallery__select { margin-left: auto; }
+
+.tile__check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(247, 243, 236, 0.9);
+  background: rgba(38, 48, 42, 0.45);
+  color: var(--avorio);
+  font-size: 15px;
+  line-height: 23px;
+  text-align: center;
+}
+
+.tile--picked .tile__check { background: var(--verde); }
+.tile--picked .tile__media { outline: 2px solid var(--verde); outline-offset: -2px; }
+.tile--picked .tile__media img,
+.tile--picked .tile__media video { opacity: 0.82; }
+
+.selbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px var(--pad-x) calc(12px + env(safe-area-inset-bottom));
+  background: var(--avorio);
+  border-top: 1px solid var(--bordo);
+}
+
+.selbar__count {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--muted-2);
+}

@@ -9,6 +9,15 @@
       </div>
     </div>
 
+    <button
+      type="button"
+      class="chip gallery__select"
+      [class.chip--on]="selectionMode()"
+      (click)="toggleSelectionMode()"
+    >
+      {{ selectionMode() ? 'Annulla' : 'Seleziona' }}
+    </button>
+
     <div class="gallery__chips">
       @for (filter of filters; track filter.label) {
         <button
@@ -37,8 +46,15 @@
     } @else {
       <div class="masonry">
         @for (item of items(); track item.id; let i = $index) {
-          <article class="tile" (click)="openViewer(i)">
+          <article
+            class="tile"
+            [class.tile--picked]="isSelected(item.id)"
+            (click)="onTileClick(i)"
+          >
             <div class="tile__media">
+              @if (selectionMode()) {
+                <span class="tile__check" aria-hidden="true">{{ isSelected(item.id) ? '✓' : '' }}</span>
+              }
               @if (item.mediaType === 'PHOTO') {
                 <img [src]="thumbnailFor(item)" [alt]="item.originalFilename" loading="lazy" decoding="async" />
               } @else {
@@ -66,6 +82,22 @@
       <p class="gallery__count">{{ items().length }} ricordi condivisi finora</p>
     }
   </div>
+
+  @if (selectionMode()) {
+    <div class="selbar">
+      <span class="selbar__count">
+        {{ selection().length }} selezionati
+      </span>
+      <button
+        class="btn btn--verde"
+        type="button"
+        (click)="downloadSelection()"
+        [disabled]="selection().length === 0"
+      >
+        Scarica
+      </button>
+    </div>
+  }
 
   @if (viewerItem; as item) {
     <div class="viewer" role="dialog" aria-modal="true">

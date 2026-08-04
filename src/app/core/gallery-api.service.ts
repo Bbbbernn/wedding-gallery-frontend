@@ -85,6 +85,15 @@ export class GalleryApiService {
    * (403 se il file non appartiene all'invitato del token): qui non serve
    * ripetere quel controllo, solo mostrare l'azione ai file giusti (vedi Gallery).
    */
+  /**
+   * URL dello ZIP con i contenuti selezionati. Non si usa HttpClient: il link viene aperto
+   * dal browser, che scrive lo ZIP su disco man mano invece di tenerlo in memoria.
+   */
+  archiveUrl(ids: string[]): string {
+    const query = ids.map((id) => `ids=${encodeURIComponent(id)}`).join('&');
+    return `${this.baseUrl}/media/archive?${query}`;
+  }
+
   deleteMedia(id: string): Observable<void> {
     const headers = new HttpHeaders(
       this.session.token ? { 'X-Guest-Token': this.session.token } : {},

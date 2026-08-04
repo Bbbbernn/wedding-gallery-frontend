@@ -1,6 +1,7 @@
 import { Component, DOCUMENT, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { GalleryApiService } from '../../core/gallery-api.service';
 import { GuestSessionService } from '../../core/guest-session.service';
+import { ToastService } from '../../core/toast.service';
 import { MediaItemResponse } from '../../core/models/media-item';
 import { MediaType } from '../../core/models/media-type';
 
@@ -8,6 +9,9 @@ const PAGE_SIZE = 24;
 
 /** Tipi mostrati in galleria con il filtro "Tutti": gli audio stanno nella sezione Voci. */
 const GALLERY_TYPES: MediaType[] = ['PHOTO', 'VIDEO'];
+
+/** Deve restare allineato a MAX_SELECTION nel MediaController: il vincolo e' la lunghezza dell'URL. */
+const MAX_SELECTION = 50;
 
 /**
  * Galleria condivisa in masonry (colonne CSS) + visualizzatore a schermo intero.
@@ -22,6 +26,7 @@ const GALLERY_TYPES: MediaType[] = ['PHOTO', 'VIDEO'];
 export class Gallery implements OnInit, OnDestroy {
   private readonly api = inject(GalleryApiService);
   private readonly session = inject(GuestSessionService);
+  private readonly toast = inject(ToastService);
   private readonly document = inject(DOCUMENT);
 
   readonly items = signal<MediaItemResponse[]>([]);
@@ -33,6 +38,8 @@ export class Gallery implements OnInit, OnDestroy {
   readonly viewerIndex = signal<number | null>(null);
   readonly deleting = signal(false);
   readonly confirmingDelete = signal(false);
+  readonly selectionMode = signal(false);
+  readonly selection = signal<string[]>([]);
 
   /** Posizione della galleria al momento dell'apertura, da ripristinare alla chiusura. */
   private lockedScrollY: number | null = null;
@@ -54,6 +61,7 @@ export class Gallery implements OnInit, OnDestroy {
 
   onFilterChange(type: MediaType | null): void {
     this.filterType.set(type);
+    this.selection.set([]);
     this.loadFirstPage();
   }
 
@@ -85,6 +93,53 @@ export class Gallery implements OnInit, OnDestroy {
       },
       error: () => this.loadingMore.set(false),
     });
+  }
+
+  /** In modalita' selezione il tocco sulla tile spunta il contenuto invece di aprirlo. */
+  onTileClick(index: number): void {
+    if (this.selectionMode()) {
+      this.toggleSelection(this.items()[index].id);
+      return;
+    }
+    this.openViewer(index);
+  }
+
+  toggleSelectionMode(): void {
+    const next = !this.selectionMode();
+    this.selectionMode.set(next);
+    if (!next) {
+      this.selection.set([]);
+    }
+  }
+
+  isSelected(id: string): boolean {
+    return this.selection().includes(id);
+  }
+
+  toggleSelection(id: string): void {
+    const current = this.selection();
+    if (current.includes(id)) {
+      this.selection.set(current.filter((selected) => selected !== id));
+      return;
+    }
+    if (current.length >= MAX_SELECTION) {
+      this.toast.show(`Puoi scaricarne al massimo ${MAX_SELECTION} per volta.`);
+      return;
+    }
+    this.selection.set([...current, id]);
+  }
+
+  /**
+   * Il download parte come navigazione verso l'URL dello ZIP: il browser lo tratta come
+   * un file da salvare (Content-Disposition: attachment) e la pagina resta dov'e'.
+   */
+  downloadSelection(): void {
+    const ids = this.selection();
+    if (ids.length === 0) {
+      return;
+    }
+    this.toast.show('Preparo il file da scaricare…');
+    this.document.defaultView?.location.assign(this.api.archiveUrl(ids));
   }
 
   openViewer(index: number): void {
@@ -175,6 +230,7 @@ export class Gallery implements OnInit, OnDestroy {
     this.api.deleteMedia(item.id).subscribe({
       next: () => {
         this.items.update((current) => current.filter((i) => i.id !== item.id));
+        this.selection.update((current) => current.filter((id) => id !== item.id));
         this.deleting.set(false);
         this.confirmingDelete.set(false);
         this.closeViewer();
