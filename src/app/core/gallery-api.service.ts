@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from './environment';
+import { Contributor } from './models/contributor';
 import { GuestRegisteredResponse, GuestResponse, GuestSignRequest } from './models/guest';
 import {
   MediaItemResponse,
@@ -51,6 +52,7 @@ export class GalleryApiService {
     size: number,
     type?: MediaType | null,
     types?: MediaType[] | null,
+    guestId?: string | null,
   ): Observable<PageResponse<MediaItemResponse>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (type) {
@@ -58,6 +60,9 @@ export class GalleryApiService {
     }
     for (const value of types ?? []) {
       params = params.append('types', value);
+    }
+    if (guestId) {
+      params = params.set('guestId', guestId);
     }
     return this.http.get<PageResponse<MediaItemResponse>>(`${this.baseUrl}/media`, { params });
   }
@@ -85,6 +90,11 @@ export class GalleryApiService {
    * (403 se il file non appartiene all'invitato del token): qui non serve
    * ripetere quel controllo, solo mostrare l'azione ai file giusti (vedi Gallery).
    */
+  /** Chi ha caricato almeno un contenuto visibile, per il filtro per persona. */
+  listContributors(): Observable<Contributor[]> {
+    return this.http.get<Contributor[]>(`${this.baseUrl}/guests/contributors`);
+  }
+
   /**
    * URL dello ZIP con i contenuti selezionati. Non si usa HttpClient: il link viene aperto
    * dal browser, che scrive lo ZIP su disco man mano invece di tenerlo in memoria.

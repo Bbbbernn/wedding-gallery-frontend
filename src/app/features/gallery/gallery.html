@@ -30,6 +30,28 @@
         {{ selectionMode() ? 'Annulla' : 'Seleziona' }}
       </button>
     </div>
+
+    @if (contributors().length > 0) {
+      <div class="gallery__who">
+        <label class="gallery__who-label" for="guest-filter">Di chi</label>
+        <div class="picker" [class.picker--on]="guestFilter()">
+          <select
+            id="guest-filter"
+            class="picker__field"
+            [value]="guestFilter() ?? ''"
+            (change)="onGuestChange($any($event.target).value)"
+          >
+            <option value="">Tutti gli invitati</option>
+            @for (contributor of contributors(); track contributor.id) {
+              <option [value]="contributor.id">
+                {{ contributor.displayName }} ({{ contributor.uploadCount }})
+              </option>
+            }
+          </select>
+          <span class="picker__arrow" aria-hidden="true">▾</span>
+        </div>
+      </div>
+    }
   </header>
 
   <div class="gallery__body">
@@ -40,8 +62,15 @@
     } @else if (items().length === 0) {
       <div class="state">
         <img class="state__mark" src="logo-mr.png" alt="" />
-        <p class="state__title">Ancora nessun ricordo</p>
-        <p class="state__text">Sii tu il primo a lasciare qualcosa qui dentro.</p>
+        @if (guestFilter()) {
+          <p class="state__title">Niente da mostrare</p>
+          <p class="state__text">
+            {{ guestFilterName() }} non ha contenuti di questo tipo.
+          </p>
+        } @else {
+          <p class="state__title">Ancora nessun ricordo</p>
+          <p class="state__text">Sii tu il primo a lasciare qualcosa qui dentro.</p>
+        }
       </div>
     } @else {
       <div class="masonry">

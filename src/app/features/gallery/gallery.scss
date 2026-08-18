@@ -313,3 +313,64 @@
   letter-spacing: 0.04em;
   color: var(--muted-2);
 }
+
+/* ---- Filtro per persona ---- */
+
+.gallery__who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 var(--pad-x) 12px;
+}
+
+.gallery__who-label {
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  padding-left: 0.22em;
+}
+
+/* Stesso guscio dei chip (altezza, raggio, bordo) attorno a una <select> nativa:
+   sui telefoni apre la rotella di sistema, molto piu' comoda di un menu fatto a mano. */
+.picker {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.picker__field {
+  appearance: none;
+  width: 100%;
+  min-height: 38px;
+  padding: 0 34px 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--bordo-forte);
+  background: var(--carta);
+  color: #5c574f;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+}
+
+.picker__arrow {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+
+/* Filtro attivo: stessa coppia verde/avorio dei chip selezionati. La classe arriva
+   dal componente perche' una <select> non si puo' interrogare via CSS sul valore. */
+.picker--on .picker__field {
+  background: var(--verde);
+  border-color: var(--verde);
+  color: var(--avorio);
+}
+
+.picker--on .picker__arrow { color: var(--avorio); }

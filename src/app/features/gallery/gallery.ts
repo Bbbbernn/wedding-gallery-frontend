@@ -1,4 +1,5 @@
 import { Component, DOCUMENT, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Contributor } from '../../core/models/contributor';
 import { GalleryApiService } from '../../core/gallery-api.service';
 import { GuestSessionService } from '../../core/guest-session.service';
 import { ToastService } from '../../core/toast.service';
@@ -33,6 +34,8 @@ export class Gallery implements OnInit, OnDestroy {
   readonly loading = signal(false);
   readonly loadingMore = signal(false);
   readonly filterType = signal<MediaType | null>(null);
+  readonly contributors = signal<Contributor[]>([]);
+  readonly guestFilter = signal<string | null>(null);
   readonly page = signal(0);
   readonly hasMore = signal(true);
   readonly viewerIndex = signal<number | null>(null);
@@ -52,6 +55,30 @@ export class Gallery implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadFirstPage();
+    this.loadContributors();
+  }
+
+  /**
+   * Elenco per il menu "di chi". Se la chiamata fallisce si resta con la lista vuota e il
+   * menu non compare: e' un filtro in piu', non deve impedire di vedere la galleria.
+   */
+  private loadContributors(): void {
+    this.api.listContributors().subscribe({
+      next: (list) => this.contributors.set(list),
+      error: () => this.contributors.set([]),
+    });
+  }
+
+  /** Nome mostrato accanto al conteggio nello stato vuoto. */
+  guestFilterName(): string {
+    const id = this.guestFilter();
+    return this.contributors().find((c) => c.id === id)?.displayName ?? '';
+  }
+
+  onGuestChange(value: string): void {
+    this.guestFilter.set(value || null);
+    this.selection.set([]);
+    this.loadFirstPage();
   }
 
   /** Se si lascia la pagina con il visualizzatore aperto, lo scroll va comunque sbloccato. */
@@ -68,14 +95,16 @@ export class Gallery implements OnInit, OnDestroy {
   loadFirstPage(): void {
     this.loading.set(true);
     this.page.set(0);
-    this.api.listMedia(0, PAGE_SIZE, this.filterType(), this.typesFilter()).subscribe({
-      next: (result) => {
-        this.items.set(result.content);
-        this.hasMore.set(!result.last);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false),
-    });
+    this.api
+      .listMedia(0, PAGE_SIZE, this.filterType(), this.typesFilter(), this.guestFilter())
+      .subscribe({
+        next: (result) => {
+          this.items.set(result.content);
+          this.hasMore.set(!result.last);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
   }
 
   loadMore(): void {
@@ -84,15 +113,17 @@ export class Gallery implements OnInit, OnDestroy {
     }
     this.loadingMore.set(true);
     const nextPage = this.page() + 1;
-    this.api.listMedia(nextPage, PAGE_SIZE, this.filterType(), this.typesFilter()).subscribe({
-      next: (result) => {
-        this.items.update((current) => [...current, ...result.content]);
-        this.page.set(nextPage);
-        this.hasMore.set(!result.last);
-        this.loadingMore.set(false);
-      },
-      error: () => this.loadingMore.set(false),
-    });
+    this.api
+      .listMedia(nextPage, PAGE_SIZE, this.filterType(), this.typesFilter(), this.guestFilter())
+      .subscribe({
+        next: (result) => {
+          this.items.update((current) => [...current, ...result.content]);
+          this.page.set(nextPage);
+          this.hasMore.set(!result.last);
+          this.loadingMore.set(false);
+        },
+        error: () => this.loadingMore.set(false),
+      });
   }
 
   /** In modalita' selezione il tocco sulla tile spunta il contenuto invece di aprirlo. */
