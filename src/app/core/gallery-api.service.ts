@@ -71,7 +71,7 @@ export class GalleryApiService {
     return this.http.get<MediaStatsResponse>(`${this.baseUrl}/media/stats`);
   }
 
-  // ---------------- upload ---------------
+  // ---------------- upload ----------------
 
   upload(files: File[], caption?: string): Observable<MediaUploadResponse> {
     const formData = new FormData();
