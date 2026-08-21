@@ -295,12 +295,11 @@
   background: var(--avorio);
 }
 
-/* Pulsante solo icona: piu' basso e stretto degli altri chip, per non rubare spazio.
-   32px resta un bersaglio comodo da toccare; sotto diventerebbe difficile centrarlo. */
+/* Pulsante solo icona: piu' basso e stretto degli altri chip, per non rubare spazio. */
 .chip--icon {
-  width: 32px;
-  min-width: 32px;
-  min-height: 32px;
+  width: 28px;
+  min-width: 28px;
+  min-height: 28px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -311,13 +310,13 @@
 /* Quattro quadratini disegnati in CSS. Usano currentColor, cosi' diventano avorio
    da soli quando il chip e' attivo. */
 .ico-grid {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   background:
     linear-gradient(currentColor, currentColor) 0 0 / 4px 4px no-repeat,
-    linear-gradient(currentColor, currentColor) 7px 0 / 4px 4px no-repeat,
-    linear-gradient(currentColor, currentColor) 0 7px / 4px 4px no-repeat,
-    linear-gradient(currentColor, currentColor) 7px 7px / 4px 4px no-repeat;
+    linear-gradient(currentColor, currentColor) 6px 0 / 4px 4px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 6px / 4px 4px no-repeat,
+    linear-gradient(currentColor, currentColor) 6px 6px / 4px 4px no-repeat;
 }
 
 .tile__check {
