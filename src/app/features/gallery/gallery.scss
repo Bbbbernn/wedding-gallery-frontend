@@ -26,11 +26,13 @@
   color: var(--verde);
 }
 
+/* Solo i filtri per tipo: tre chip, che entrano sempre in larghezza. I comandi
+   (zoom e selezione) stanno sulla riga sotto, altrimenti il totale sfora su
+   telefono e la riga diventa scorrevole nascondendo meta' dei pulsanti. */
 .gallery__chips {
   display: flex;
   gap: 8px;
-  padding: 2px var(--pad-x) 14px;
-  overflow-x: auto;
+  padding: 2px var(--pad-x) 10px;
 }
 
 .chip {
@@ -280,19 +282,14 @@
 
 /* ---- Selezione multipla e download in ZIP ---- */
 
-/* Coppia di comandi in fondo alla riga dei filtri: zoom e selezione.
-   Stanno insieme in un contenitore sticky perche' su schermi stretti i chip dei
-   filtri scorrono in orizzontale, e da soli finirebbero uno sotto l'altro. Lo
-   sfondo pieno impedisce ai chip di trasparire mentre passano dietro. */
+/* Zoom e selezione, ancorati a destra della seconda riga. Larghezza fissa: e' la
+   select accanto a restringersi quando lo spazio manca, non i pulsanti. */
 .gallery__tools {
+  flex: 0 0 auto;
   margin-left: auto;
-  position: sticky;
-  right: 0;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding-left: 10px;
-  background: var(--avorio);
 }
 
 /* Pulsante solo icona: piu' basso e stretto degli altri chip, per non rubare spazio. */
@@ -361,20 +358,12 @@
 
 /* ---- Filtro per persona ---- */
 
+/* Seconda riga: filtro per persona a sinistra, comandi a destra. */
 .gallery__who {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 0 var(--pad-x) 12px;
-}
-
-.gallery__who-label {
-  flex: 0 0 auto;
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted-2);
-  padding-left: 0.22em;
 }
 
 /* Stesso guscio dei chip (altezza, raggio, bordo) attorno a una <select> nativa:
