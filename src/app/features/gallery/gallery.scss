@@ -280,21 +280,42 @@
 
 /* ---- Selezione multipla e download in ZIP ---- */
 
-/* Ultimo elemento della riga dei filtri, spinto tutto a destra.
-   position: sticky lo tiene visibile anche se i filtri dovessero
-   scorrere in orizzontale su schermi molto stretti; lo sfondo pieno
-   serve a non far passare i filtri sotto di lui mentre scorrono. */
-.gallery__select {
+/* Coppia di comandi in fondo alla riga dei filtri: zoom e selezione.
+   Stanno insieme in un contenitore sticky perche' su schermi stretti i chip dei
+   filtri scorrono in orizzontale, e da soli finirebbero uno sotto l'altro. Lo
+   sfondo pieno impedisce ai chip di trasparire mentre passano dietro. */
+.gallery__tools {
   margin-left: auto;
   position: sticky;
   right: 0;
-  background: var(--carta);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 10px;
+  background: var(--avorio);
 }
 
-/* In modalita' selezione si comporta come un chip attivo: verde pieno e
-   testo avorio. La doppia classe serve a battere lo sfondo neutro qui
-   sopra, che altrimenti vincerebbe su .chip--on perche' viene dopo. */
-.gallery__select.chip--on { background: var(--verde); }
+/* Pulsante solo icona: quadrato piccolo, senza testo, per non rubare spazio. */
+.chip--icon {
+  width: 38px;
+  min-width: 38px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Quattro quadratini disegnati in CSS. Usano currentColor, cosi' diventano avorio
+   da soli quando il chip e' attivo. */
+.ico-grid {
+  width: 13px;
+  height: 13px;
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / 5px 5px no-repeat,
+    linear-gradient(currentColor, currentColor) 8px 0 / 5px 5px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 8px / 5px 5px no-repeat,
+    linear-gradient(currentColor, currentColor) 8px 8px / 5px 5px no-repeat;
+}
 
 .tile__check {
   position: absolute;

@@ -21,24 +21,26 @@
         </button>
       }
 
-      <button
-        type="button"
-        class="chip gallery__zoom"
-        [class.chip--on]="compact()"
-        (click)="toggleCompact()"
-        [attr.aria-label]="compact() ? 'Ingrandisci le anteprime' : 'Rimpicciolisci le anteprime'"
-      >
-        {{ compact() ? 'Grandi' : 'Piccole' }}
-      </button>
+      <div class="gallery__tools">
+        <button
+          type="button"
+          class="chip chip--icon"
+          [class.chip--on]="compact()"
+          (click)="toggleCompact()"
+          [attr.aria-label]="compact() ? 'Anteprime piu\' grandi' : 'Anteprime piu\' piccole'"
+        >
+          <span class="ico-grid" aria-hidden="true"></span>
+        </button>
 
-      <button
-        type="button"
-        class="chip gallery__select"
-        [class.chip--on]="selectionMode()"
-        (click)="toggleSelectionMode()"
-      >
-        {{ selectionMode() ? 'Annulla' : 'Seleziona' }}
-      </button>
+        <button
+          type="button"
+          class="chip"
+          [class.chip--on]="selectionMode()"
+          (click)="toggleSelectionMode()"
+        >
+          {{ selectionMode() ? 'Annulla' : 'Seleziona' }}
+        </button>
+      </div>
     </div>
 
     @if (contributors().length > 0) {
