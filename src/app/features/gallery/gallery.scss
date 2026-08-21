@@ -49,7 +49,29 @@
 
 .gallery__body { padding: 16px clamp(14px, 4vw, 18px) 0; }
 
+/* Due colonne sul telefono; su schermi piu' larghi le anteprime diventerebbero enormi,
+   quindi il numero di colonne cresce con la larghezza. */
 .masonry { column-count: 2; column-gap: 10px; }
+
+@media (min-width: 640px) {
+  .masonry { column-count: 3; column-gap: 12px; }
+}
+
+@media (min-width: 1000px) {
+  .masonry { column-count: 4; column-gap: 12px; }
+}
+
+/* Vista compatta scelta dall'utente: una colonna in piu' rispetto al normale a ogni
+   larghezza, per scorrere in fretta quando i contenuti sono molti. */
+.masonry--compact { column-count: 4; column-gap: 6px; }
+
+@media (min-width: 640px) {
+  .masonry--compact { column-count: 5; column-gap: 8px; }
+}
+
+@media (min-width: 1000px) {
+  .masonry--compact { column-count: 7; column-gap: 8px; }
+}
 
 .tile {
   break-inside: avoid;
@@ -374,3 +396,28 @@
 }
 
 .picker--on .picker__arrow { color: var(--avorio); }
+
+/* ---- Ritocchi della vista compatta ----
+   In fondo al file di proposito: devono vincere su .tile e .tile__badge, che hanno la
+   stessa specificita' ma sono scritti piu' sopra. */
+
+.masonry--compact .tile { margin-bottom: 6px; }
+
+.masonry--compact .tile__badge {
+  top: 5px;
+  right: 5px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 20px;
+}
+
+.masonry--compact .tile__check {
+  top: 5px;
+  right: 5px;
+  width: 21px;
+  height: 21px;
+  font-size: 12px;
+  line-height: 18px;
+}

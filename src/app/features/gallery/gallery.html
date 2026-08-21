@@ -23,6 +23,16 @@
 
       <button
         type="button"
+        class="chip gallery__zoom"
+        [class.chip--on]="compact()"
+        (click)="toggleCompact()"
+        [attr.aria-label]="compact() ? 'Ingrandisci le anteprime' : 'Rimpicciolisci le anteprime'"
+      >
+        {{ compact() ? 'Grandi' : 'Piccole' }}
+      </button>
+
+      <button
+        type="button"
         class="chip gallery__select"
         [class.chip--on]="selectionMode()"
         (click)="toggleSelectionMode()"
@@ -73,7 +83,7 @@
         }
       </div>
     } @else {
-      <div class="masonry">
+      <div class="masonry" [class.masonry--compact]="compact()">
         @for (item of items(); track item.id; let i = $index) {
           <article
             class="tile"

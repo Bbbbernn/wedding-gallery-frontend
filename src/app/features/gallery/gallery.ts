@@ -14,6 +14,9 @@ const GALLERY_TYPES: MediaType[] = ['PHOTO', 'VIDEO'];
 /** Deve restare allineato a MAX_SELECTION nel MediaController: il vincolo e' la lunghezza dell'URL. */
 const MAX_SELECTION = 50;
 
+/** Stessa convenzione di chiave usata da GuestSessionService. */
+const COMPACT_KEY = 'wedding-gallery.compact';
+
 /**
  * Galleria condivisa in masonry (colonne CSS) + visualizzatore a schermo intero.
  * Gli audio non compaiono qui: hanno la loro sezione "Voci".
@@ -41,6 +44,7 @@ export class Gallery implements OnInit, OnDestroy {
   readonly viewerIndex = signal<number | null>(null);
   readonly deleting = signal(false);
   readonly confirmingDelete = signal(false);
+  readonly compact = signal(this.readCompact());
   readonly selectionMode = signal(false);
   readonly selection = signal<string[]>([]);
 
@@ -84,6 +88,28 @@ export class Gallery implements OnInit, OnDestroy {
   /** Se si lascia la pagina con il visualizzatore aperto, lo scroll va comunque sbloccato. */
   ngOnDestroy(): void {
     this.unlockScroll();
+  }
+
+  /**
+   * Vista compatta: piu' colonne e tile piu' piccole, per scorrere in fretta quando i
+   * contenuti sono tanti. La scelta resta salvata nel browser come la firma dell'invitato.
+   */
+  toggleCompact(): void {
+    const next = !this.compact();
+    this.compact.set(next);
+    try {
+      this.document.defaultView?.localStorage.setItem(COMPACT_KEY, next ? '1' : '0');
+    } catch {
+      // Storage non disponibile (navigazione privata su iOS): la scelta vale per questa visita.
+    }
+  }
+
+  private readCompact(): boolean {
+    try {
+      return this.document.defaultView?.localStorage.getItem(COMPACT_KEY) === '1';
+    } catch {
+      return false;
+    }
   }
 
   onFilterChange(type: MediaType | null): void {
