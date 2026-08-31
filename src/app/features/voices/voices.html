@@ -14,7 +14,7 @@
       <p class="voices__empty">Nessun messaggio vocale, per ora.</p>
     } @else {
       @for (item of items(); track item.id) {
-        <article class="voice">
+        <article class="voice" [class.voice--mine]="isMine(item)">
           <audio
             #player
             [src]="contentFor(item)"
@@ -53,10 +53,37 @@
               <p class="voice__caption">{{ item.caption }}</p>
             }
           </div>
+
+          @if (isMine(item)) {
+            <button
+              type="button"
+              class="voice__delete"
+              (click)="askDelete(item)"
+              aria-label="Elimina questo messaggio"
+            >
+              ✕
+            </button>
+          }
         </article>
       }
     }
   </div>
+
+  @if (confirmingId()) {
+    <div class="confirm" role="alertdialog" aria-modal="true">
+      <div class="confirm__card">
+        <p class="confirm__text">Eliminare questo messaggio? Non si può annullare.</p>
+        <div class="confirm__actions">
+          <button class="btn btn--ghost" type="button" (click)="cancelDelete()" [disabled]="deleting()">
+            Annulla
+          </button>
+          <button class="btn btn--viola" type="button" (click)="confirmDelete()" [disabled]="deleting()">
+            {{ deleting() ? 'Un attimo…' : 'Elimina' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <div class="voices__cta">
     <p>Hai un messaggio per gli sposi?</p>
